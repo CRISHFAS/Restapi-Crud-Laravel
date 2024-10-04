@@ -9,7 +9,7 @@
 
 # Rest API CRUD - Laravel Project
 
-This project is a **REST API CRUD** application built with Laravel. It demonstrates the creation of a simple RESTful API that supports operations such as **Create**, **Read**, **Update**, and **Delete** (CRUD) on a `student` resource.
+This project is a **REST API CRUD** application built with Laravel. It demonstrates the creation of a simple REST API that supports operations such as **Create**, **Read**, **Update**, and **Delete** (CRUD) on a `student` resource.
 
 The application provides the basic functionality to manage student records, including storing and retrieving information like names, email addresses, phone numbers, and languages.
 
