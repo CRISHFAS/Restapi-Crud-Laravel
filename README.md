@@ -48,33 +48,38 @@ To get started with the project, follow these steps:
 
 2. Navigate to the project directory:
 
-   ```bash
+```bash
 
 cd Restapi-Crud-Laravel
+```
 
 3. Install dependencies using Composer:
 
-   ```bash
+```bash
 
 composer install
+```
 
 4. Create a .env file by copying the .env.example and configuring your database:
 
-   ```bash
+```bash
 
 cp .env.example .env
+```
 
 5. Run the migrations to create the students table:
 
-   ```bash
+```bash
 
 php artisan migrate
+```
 
 6. Start the Laravel development server:
 
-   ```bash
+```bash
 
     php artisan serve
+```
 
 # Testing
 
