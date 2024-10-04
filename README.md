@@ -66,7 +66,6 @@ To get started with the project, follow these steps:
     ```bash
     php artisan serve
 
-
 # Testing
 
 To test the API, you can use tools like Postman or cURL. Ensure that your local server is running at `http://127.0.0.1:8000` or your configured URL.
