@@ -47,39 +47,25 @@ To get started with the project, follow these steps:
    git clone https://github.com/CRISHFAS/Restapi-Crud-Laravel.git
 
 2. Navigate to the project directory:
-
-```bash
-
-cd Restapi-Crud-Laravel
-```
+   ```bash
+   cd Restapi-Crud-Laravel
 
 3. Install dependencies using Composer:
-
-```bash
-
-composer install
-```
+   ```bash
+   composer install
 
 4. Create a .env file by copying the .env.example and configuring your database:
-
-```bash
-
-cp .env.example .env
-```
+    ```bash
+    cp .env.example .env
 
 5. Run the migrations to create the students table:
-
-```bash
-
-php artisan migrate
-```
+    ```bash
+    php artisan migrate
 
 6. Start the Laravel development server:
-
-```bash
-
+    ```bash
     php artisan serve
-```
+
 
 # Testing
 
