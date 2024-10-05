@@ -1,3 +1,5 @@
+<?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -5,121 +7,211 @@ use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class StudentController extends Controller
+class studentController extends Controller
 {
     public function index()
     {
         $students = Student::all();
-        return response()->json(['students' => $students, 'status' => 200], 200);
+
+        // if ($students->isEmpty()) {
+        //     $data = [
+        //         'message' => 'No se encontraron estudiantes',
+        //         'status' => 200
+        //     ];
+        //     return response()->json($data, 404);
+        // }
+
+        $data = [
+            'students' => $students,
+            'status' => 200
+        ];
+
+        return response()->json($data, 200);
     }
 
     public function store(Request $request)
     {
-        $validator = $this->validateStudent($request);
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:255',
+            'email' => 'required|email|unique:student',
+            'phone' => 'required|digits:10',
+            'language' => 'required|in:English,Spanish,French'
+        ]);
 
         if ($validator->fails()) {
-            return $this->validationErrorResponse($validator);
+            $data = [
+                'message' => 'Error en la validación de los datos',
+                'errors' => $validator->errors(),
+                'status' => 400
+            ];
+            return response()->json($data, 400);
         }
 
-        $student = Student::create($request->all());
+        $student = Student::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'language' => $request->language
+        ]);
 
-        return response()->json(['student' => $student, 'status' => 201], 201);
+        if (!$student) {
+            $data = [
+                'message' => 'Error al crear el estudiante',
+                'status' => 500
+            ];
+            return response()->json($data, 500);
+        }
+
+        $data = [
+            'student' => $student,
+            'status' => 201
+        ];
+
+        return response()->json($data, 201);
+
     }
 
     public function show($id)
     {
-        $student = $this->findStudent($id);
+        $student = Student::find($id);
+
         if (!$student) {
-            return $this->notFoundResponse();
+            $data = [
+                'message' => 'Estudiante no encontrado',
+                'status' => 404
+            ];
+            return response()->json($data, 404);
         }
 
-        return response()->json(['student' => $student, 'status' => 200], 200);
+        $data = [
+            'student' => $student,
+            'status' => 200
+        ];
+
+        return response()->json($data, 200);
     }
 
     public function destroy($id)
     {
-        $student = $this->findStudent($id);
-        if (!$student) {
-            return $this->notFoundResponse();
-        }
+        $student = Student::find($id);
 
+        if (!$student) {
+            $data = [
+                'message' => 'Estudiante no encontrado',
+                'status' => 404
+            ];
+            return response()->json($data, 404);
+        }
+        
         $student->delete();
 
-        return response()->json(['message' => 'Estudiante eliminado', 'status' => 200], 200);
+        $data = [
+            'message' => 'Estudiante eliminado',
+            'status' => 200
+        ];
+
+        return response()->json($data, 200);
     }
 
     public function update(Request $request, $id)
     {
-        $student = $this->findStudent($id);
+        $student = Student::find($id);
+
         if (!$student) {
-            return $this->notFoundResponse();
+            $data = [
+                'message' => 'Estudiante no encontrado',
+                'status' => 404
+            ];
+            return response()->json($data, 404);
         }
 
-        $validator = $this->validateStudent($request, true); // true para indicar que es actualización
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:255',
+            'email' => 'required|email|unique:student',
+            'phone' => 'required|digits:10',
+            'language' => 'required|in:English,Spanish,French'
+        ]);
 
         if ($validator->fails()) {
-            return $this->validationErrorResponse($validator);
+            $data = [
+                'message' => 'Error en la validación de los datos',
+                'errors' => $validator->errors(),
+                'status' => 400
+            ];
+            return response()->json($data, 400);
         }
 
-        $student->update($request->all());
+        $student->name = $request->name;
+        $student->email = $request->email;
+        $student->phone = $request->phone;
+        $student->language = $request->language;
 
-        return response()->json(['message' => 'Estudiante actualizado', 'student' => $student, 'status' => 200], 200);
+        $student->save();
+
+        $data = [
+            'message' => 'Estudiante actualizado',
+            'student' => $student,
+            'status' => 200
+        ];
+
+        return response()->json($data, 200);
+
     }
 
     public function updatePartial(Request $request, $id)
     {
-        $student = $this->findStudent($id);
+        $student = Student::find($id);
+
         if (!$student) {
-            return $this->notFoundResponse();
+            $data = [
+                'message' => 'Estudiante no encontrado',
+                'status' => 404
+            ];
+            return response()->json($data, 404);
         }
 
         $validator = Validator::make($request->all(), [
             'name' => 'max:255',
-            'email' => 'email|unique:students,email,' . $id, // Excluir el estudiante actual
+            'email' => 'email|unique:student',
             'phone' => 'digits:10',
             'language' => 'in:English,Spanish,French'
         ]);
 
         if ($validator->fails()) {
-            return $this->validationErrorResponse($validator);
+            $data = [
+                'message' => 'Error en la validación de los datos',
+                'errors' => $validator->errors(),
+                'status' => 400
+            ];
+            return response()->json($data, 400);
         }
 
-        $student->fill($request->only(['name', 'email', 'phone', 'language']));
+        if ($request->has('name')) {
+            $student->name = $request->name;
+        }
+
+        if ($request->has('email')) {
+            $student->email = $request->email;
+        }
+
+        if ($request->has('phone')) {
+            $student->phone = $request->phone;
+        }
+
+        if ($request->has('language')) {
+            $student->language = $request->language;
+        }
+
         $student->save();
 
-        return response()->json(['message' => 'Estudiante actualizado', 'student' => $student, 'status' => 200], 200);
-    }
-
-    private function validateStudent(Request $request, $isUpdate = false)
-    {
-        $rules = [
-            'name' => 'required|max:255',
-            'email' => 'required|email|unique:students' . ($isUpdate ? ',email,' . $request->id : ''),
-            'phone' => 'required|digits:10',
-            'language' => 'required|in:English,Spanish,French'
+        $data = [
+            'message' => 'Estudiante actualizado',
+            'student' => $student,
+            'status' => 200
         ];
 
-        return Validator::make($request->all(), $rules);
+        return response()->json($data, 200);
     }
 
-    private function validationErrorResponse($validator)
-    {
-        return response()->json([
-            'message' => 'Error en la validación de los datos',
-            'errors' => $validator->errors(),
-            'status' => 400
-        ], 400);
-    }
-
-    private function findStudent($id)
-    {
-        return Student::find($id);
-    }
-
-    private function notFoundResponse()
-    {
-        return response()->json(['message' => 'Estudiante no encontrado', 'status' => 404], 404);
-    }
 }
-
-
